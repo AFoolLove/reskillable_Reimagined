@@ -15,12 +15,6 @@ public class NetworkInit {
                 RequestLevelUp.handle(payload, player);
             }
         });
-
-        registrar.playToServer(TogglePerk.TYPE, TogglePerk.STREAM_CODEC, (payload, context) -> {
-            if (context.player() instanceof ServerPlayer player) {
-                TogglePerk.handle(payload, player);
-            }
-        });
 //
 //        // Client-bound channels must still be registered on the server
 //        registrar.playToClient(NotifyWarning.TYPE, NotifyWarning.STREAM_CODEC, (payload, context) -> {});

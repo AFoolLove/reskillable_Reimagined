@@ -3,8 +3,6 @@ package net.bandit.reskillable.common;
 import net.bandit.reskillable.Configuration;
 import net.bandit.reskillable.common.capabilities.SkillModel;
 import net.bandit.reskillable.common.commands.skills.Requirement;
-import net.bandit.reskillable.common.commands.skills.Skill;
-import net.bandit.reskillable.common.commands.skills.SkillAttributeBonus;
 import net.bandit.reskillable.common.network.payload.SyncSkillConfig;
 import net.bandit.reskillable.common.network.payload.SyncToClient;
 import net.minecraft.ChatFormatting;
@@ -231,7 +229,6 @@ public class EventHandler {
             SkillModel model = SkillModel.get(serverPlayer);
             if (model != null) {
                 SyncToClient.send(serverPlayer);
-                 model.updateSkillAttributeBonuses(serverPlayer);
             }
         }
     }
@@ -244,115 +241,10 @@ public class EventHandler {
             SkillModel model = SkillModel.get(serverPlayer);
             if (model != null) {
                 model.syncSkills(serverPlayer);
-                 model.updateSkillAttributeBonuses(serverPlayer);
             }
         }
     }
 
-
-    @SubscribeEvent
-    public void onBreakSpeed(PlayerEvent.BreakSpeed event) {
-        Player player = event.getEntity();
-        SkillModel model = SkillModel.get(player);
-        if (model != null) {
-            int miningLevel = model.getSkillLevel(Skill.MINING);
-            if (miningLevel >= 5) {
-                var bonus = SkillAttributeBonus.getBySkill(Skill.MINING);
-                if (bonus != null && model.isPerkEnabled(Skill.MINING)) {
-                    float multiplier = 1.0f + (miningLevel / 5f) * (float) bonus.getBonusPerStep();
-                    event.setNewSpeed(event.getNewSpeed() * multiplier);
-                }
-            }
-        }
-    }
-
-    @SubscribeEvent
-    public void onCropGrow(CropGrowEvent.Pre event) {
-        if (!(event.getLevel() instanceof ServerLevel level)) return;
-
-        level.players().forEach(player -> {
-            if (player.distanceToSqr(Vec3.atCenterOf(event.getPos())) < 64) {
-                SkillModel model = SkillModel.get(player);
-                if (model != null) {
-                    int farmingLevel = model.getSkillLevel(Skill.FARMING);
-                    var bonus = SkillAttributeBonus.getBySkill(Skill.FARMING);
-                    if (bonus != null && model.isPerkEnabled(Skill.FARMING)) {
-                        float chance = (farmingLevel / 5f) * (float) bonus.getBonusPerStep();
-                        if (farmingLevel >= 5 && level.random.nextFloat() < chance) {
-                            event.setResult(CropGrowEvent.Pre.Result.GROW);
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-
-    @SubscribeEvent
-    public void onXpPickup(PlayerXpEvent.PickupXp event) {
-        Player player = event.getEntity();
-        if (player.level().isClientSide) return;
-
-        SkillModel model = SkillModel.get(player);
-        if (model == null || !model.isPerkEnabled(Skill.GATHERING)) return;
-
-        int gatheringLevel = model.getSkillLevel(Skill.GATHERING);
-        if (gatheringLevel < 5) return;
-
-        var bonus = SkillAttributeBonus.getBySkill(Skill.GATHERING);
-        if (bonus != null) {
-            double bonusPercentPerStep = bonus.getBonusPerStep();
-            int bonusSteps = gatheringLevel / 5;
-            float originalXp = event.getOrb().value;
-
-            int bonusXp = Math.round(originalXp * (float)(bonusSteps * bonusPercentPerStep));
-            if (bonusXp > 0) {
-                player.giveExperiencePoints(bonusXp);
-            }
-        }
-    }
-
-    @SubscribeEvent
-    public void onPlayerEquipmentChange(LivingEquipmentChangeEvent event) {
-        if (!(event.getEntity() instanceof Player player)) return;
-        SkillModel model = SkillModel.get(player);
-        if (model == null || player.level().isClientSide) return;
-
-        model.updateSkillAttributeBonuses(player);
-    }
-    @SubscribeEvent
-    public void onPlayerTickAgility(PlayerTickEvent.Post event) {
-        Player player = event.getEntity();
-        SkillModel model = SkillModel.get(player);
-        if (model == null) return;
-
-        var attribute = player.getAttributes().getInstance(Attributes.MOVEMENT_SPEED);
-        if (attribute == null) return;
-
-        var bonus = SkillAttributeBonus.getBySkill(Skill.AGILITY);
-        if (bonus == null) return;
-
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath("reskillable", "agility");
-
-        attribute.getModifiers().stream()
-                .filter(mod -> mod.id().equals(id))
-                .findFirst()
-                .ifPresent(attribute::removeModifier);
-
-        int agilityLevel = model.getSkillLevel(Skill.AGILITY);
-        if (agilityLevel >= 5 && model.isPerkEnabled(Skill.AGILITY)) {
-            double multiplier = (agilityLevel / 5.0) * bonus.getBonusPerStep();
-
-            if (multiplier > 0) {
-                AttributeModifier mod = new AttributeModifier(
-                        id,
-                        multiplier,
-                        AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
-                );
-                attribute.addTransientModifier(mod);
-            }
-        }
-    }
     @SubscribeEvent
     public void onUseTotem(LivingUseTotemEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;

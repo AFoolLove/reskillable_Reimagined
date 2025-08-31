@@ -5,9 +5,7 @@ import net.bandit.reskillable.Configuration;
 import net.bandit.reskillable.client.screen.SkillScreen;
 import net.bandit.reskillable.common.capabilities.SkillModel;
 import net.bandit.reskillable.common.commands.skills.Skill;
-import net.bandit.reskillable.common.commands.skills.SkillAttributeBonus;
 import net.bandit.reskillable.common.network.payload.RequestLevelUp;
-import net.bandit.reskillable.common.network.payload.TogglePerk;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -55,12 +53,6 @@ public class SkillButton extends Button {
         guiGraphics.blit(SkillScreen.RESOURCES, getX(), getY(), 176, (level == maxLevel ? 64 : 0) + (isMouseOver(mouseX, mouseY) ? 32 : 0), width, height);
         guiGraphics.blit(SkillScreen.RESOURCES, getX() + 6, getY() + 8, u, v, 16, 16);
 
-        if (!skillModel.isPerkEnabled(skill) && SkillAttributeBonus.getBySkill(skill) != null) {
-            int iconX = getX() + width - 10;
-            int iconY = getY() + height - 10;
-            guiGraphics.drawString(font, "✖", iconX, iconY, 0xFF5555, false);
-        }
-
         guiGraphics.drawString(font, Component.translatable(skill.getDisplayName()), getX() + 25, getY() + 7, 0xFFFFFF, false);
         guiGraphics.drawString(font, Component.literal(level + "/" + maxLevel), getX() + 25, getY() + 18, 0xBEBEBE, false);
 
@@ -87,12 +79,7 @@ public class SkillButton extends Button {
         SkillModel model = SkillModel.get(player);
         if (model == null) return false;
 
-        if (button == 1) { // Right-click
-            if (SkillAttributeBonus.getBySkill(skill) != null) {
-                TogglePerk.send(skill);
-                player.playSound(net.minecraft.sounds.SoundEvents.UI_BUTTON_CLICK.value(), 0.6F, 1.0F);
-            }
-        } else if (button == 0) { // Left-click
+        if (button == 0) { // Left-click
             RequestLevelUp.send(skill);
         }
 
@@ -111,15 +98,6 @@ public class SkillButton extends Button {
         Component xp = Component.literal(String.valueOf(playerXP)).withStyle(playerXP >= cost ? ChatFormatting.GREEN : ChatFormatting.RED);
         Component costC = Component.literal(String.valueOf(cost));
         lines.add(Component.translatable("tooltip.rereskillable.skill_cost", xp, costC));
-
-        if (SkillAttributeBonus.getBySkill(skill) != null) {
-            boolean enabled = model.isPerkEnabled(skill);
-            lines.add(Component.literal("➤ ")
-                    .append(Component.translatable("tooltip.rereskillable.right_click").withStyle(ChatFormatting.GOLD))
-                    .append(Component.translatable(
-                            enabled ? "tooltip.rereskillable.disable_perk" : "tooltip.rereskillable.enable_perk"
-                    ).withStyle(enabled ? ChatFormatting.RED : ChatFormatting.GREEN)));
-        }
 
         lines.add(Component.literal("➤ ")
                 .append(Component.translatable("tooltip.rereskillable.left_click").withStyle(ChatFormatting.GOLD))

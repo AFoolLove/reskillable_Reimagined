@@ -23,17 +23,9 @@
   "reskillable.server.disabled": "此服务器已禁用技能升级。",
   "reskillable.maxlevel": "技能已达最大等级。",
   "reskillable.not_enough": "XP不足，无法升级此技能。",
-  "tooltip.rereskillable.run_speed": "奔跑速度",
-  "tooltip.rereskillable.break_speed": "破坏速度",
-  "tooltip.rereskillable.bonus_xp_orbs": "额外XP来自经验球",
-  "tooltip.rereskillable.crop_growth": "作物成长",
   "tooltip.rereskillable.total_xp": "总XP：%s（等级：%s）",
   "tooltip.rereskillable.xp_cost": "XP：%s",
-  "tooltip.rereskillable.requires_level_5": "（5级解锁）",
   "gui.reskillable.skills": "技能",
-  "tooltip.rereskillable.right_click": "右键：",
   "tooltip.rereskillable.left_click": "左键：",
-  "tooltip.rereskillable.enable_perk": "启用技能特性",
-  "tooltip.rereskillable.disable_perk": "禁用技能特性",
   "tooltip.rereskillable.level_up": "提升该技能等级"
 }

@@ -23,17 +23,9 @@
   "reskillable.server.disabled": "Повышение навыков на этом сервере отключено.",
   "reskillable.maxlevel": "Навык уже на максимальном уровне.",
   "reskillable.not_enough": "Недостаточно XP для повышения навыка.",
-  "tooltip.rereskillable.run_speed": "Скорость бега",
-  "tooltip.rereskillable.break_speed": "Скорость добычи",
-  "tooltip.rereskillable.bonus_xp_orbs": "Доп. XP из сфер",
-  "tooltip.rereskillable.crop_growth": "Рост урожая",
   "tooltip.rereskillable.total_xp": "Всего XP: %s (Уровень: %s)",
   "tooltip.rereskillable.xp_cost": "XP: %s",
-  "tooltip.rereskillable.requires_level_5": "(Требуется уровень 5)",
   "gui.reskillable.skills": "Навыки",
-  "tooltip.rereskillable.right_click": "ПКМ: ",
   "tooltip.rereskillable.left_click": "ЛКМ: ",
-  "tooltip.rereskillable.enable_perk": "Включить навык",
-  "tooltip.rereskillable.disable_perk": "Отключить навык",
   "tooltip.rereskillable.level_up": "Повысить уровень навыка"
 }

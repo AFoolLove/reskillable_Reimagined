@@ -5,7 +5,6 @@ import net.bandit.reskillable.Configuration;
 import net.bandit.reskillable.client.screen.buttons.SkillButton;
 import net.bandit.reskillable.common.capabilities.SkillModel;
 import net.bandit.reskillable.common.commands.skills.Skill;
-import net.bandit.reskillable.common.commands.skills.SkillAttributeBonus;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -113,95 +112,6 @@ public class SkillScreen extends Screen {
         List<Component> tooltipLines = new ArrayList<>();
         tooltipLines.add(tooltip);
 
-        tooltipLines.add(Component.literal(" "));
-
-        SkillModel model = SkillModel.get(player);
-        if (model != null) {
-            for (Skill skill : Skill.values()) {
-                int skillLevel = model.getSkillLevel(skill);
-
-                var bonus = SkillAttributeBonus.getBySkill(skill);
-                Attribute attribute = bonus != null ? bonus.getAttribute() : null;
-
-                if (bonus != null && attribute != null && skillLevel >= 5) {
-                    double amount = (skillLevel / 5.0) * bonus.getBonusPerStep();
-
-                    if (amount > 0) {
-                        Component skillName = Component.translatable("skill." + skill.name().toLowerCase()).withStyle(ChatFormatting.GOLD);
-                        Component attrName = Component.translatable(attribute.getDescriptionId()).withStyle(ChatFormatting.GRAY);
-
-                        String percentText = String.format("+%.0f%%", amount * 100);
-                        Component bonusLine = Component.literal("")
-                                .append(skillName)
-                                .append(": ")
-                                .append(Component.literal(percentText).withStyle(ChatFormatting.AQUA))
-                                .append(" ")
-                                .append(attrName);
-
-                        tooltipLines.add(bonusLine);
-                    }
-                }
-                else {
-                    Component skillName = Component.translatable("skill." + skill.name().toLowerCase()).withStyle(ChatFormatting.GOLD);
-                    Component bonusLine = switch (skill) {
-                        case AGILITY -> Component.literal("")
-                                .append(skillName)
-                                .append(": ")
-                                .append(Component.literal(skillLevel >= 5
-                                        ? String.format("+%.0f%%", (skillLevel / 5.0) * 25)
-                                        : "+0%").withStyle(ChatFormatting.AQUA))
-                                .append(" ")
-                                .append(Component.literal("Run Speed").withStyle(ChatFormatting.GRAY))
-                                .append(skillLevel < 5
-                                        ? Component.literal(" (Requires Level 5)").withStyle(ChatFormatting.DARK_GRAY)
-                                        : Component.empty());
-
-                        case MINING -> Component.literal("")
-                                .append(skillName)
-                                .append(": ")
-                                .append(Component.literal(skillLevel >= 5
-                                        ? String.format("+%.0f%%", (skillLevel / 5.0) * 25)
-                                        : "+0%").withStyle(ChatFormatting.AQUA))
-                                .append(" ")
-                                .append(Component.literal("Break Speed").withStyle(ChatFormatting.GRAY))
-                                .append(skillLevel < 5
-                                        ? Component.literal(" (Requires Level 5)").withStyle(ChatFormatting.DARK_GRAY)
-                                        : Component.empty());
-
-                        case GATHERING -> Component.literal("")
-                                .append(skillName)
-                                .append(": ")
-                                .append(Component.literal(skillLevel >= 5
-                                        ? String.format("+%.0f%%", (skillLevel / 5.0 * Configuration.GATHERING_XP_BONUS.get() * 100))
-                                        : "+0%").withStyle(ChatFormatting.AQUA))
-                                .append(" ")
-                                .append(Component.literal("Bonus XP from Orbs").withStyle(ChatFormatting.GRAY))
-                                .append(skillLevel < 5
-                                        ? Component.literal(" (Requires Level 5)").withStyle(ChatFormatting.DARK_GRAY)
-                                        : Component.empty());
-
-                        case FARMING -> Component.literal("")
-                                .append(skillName)
-                                .append(": ")
-                                .append(Component.literal(skillLevel >= 5
-                                        ? "+" + (int)((skillLevel / 5.0) * 25) + "%"
-                                        : "+0%").withStyle(ChatFormatting.AQUA))
-                                .append(" ")
-                                .append(Component.literal("Crop Growth").withStyle(ChatFormatting.GRAY))
-                                .append(skillLevel < 5
-                                        ? Component.literal(" (Requires Level 5)").withStyle(ChatFormatting.DARK_GRAY)
-                                        : Component.empty());
-
-                        default -> null;
-                    };
-
-                    if (bonusLine != null) {
-                        tooltipLines.add(bonusLine);
-                    }
-                }
-
-            }
-        }
         guiGraphics.renderTooltip(
                 Minecraft.getInstance().font,
                 tooltipLines.stream().map(Component::getVisualOrderText).toList(),
