@@ -5,6 +5,7 @@ import net.bandit.reskillable.common.capabilities.SkillModel;
 import net.bandit.reskillable.common.commands.skills.Requirement;
 import net.bandit.reskillable.common.commands.skills.Skill;
 import net.bandit.reskillable.common.commands.skills.SkillAttributeBonus;
+import net.bandit.reskillable.common.network.payload.SyncSkillConfig;
 import net.bandit.reskillable.common.network.payload.SyncToClient;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -190,6 +191,7 @@ public class EventHandler {
         SkillModel model = SkillModel.get(player);
         if (model != null) {
             SyncToClient.send(player);
+            SyncSkillConfig.sendToClient(player, false);
         }
     }
 
@@ -362,7 +364,9 @@ public class EventHandler {
         if (model == null) return;
 
         Requirement[] reqs = Configuration.getRequirements(Items.TOTEM_OF_UNDYING.builtInRegistryHolder().key().location());
-
+        if (reqs == null) {
+            return;
+        }
         for (Requirement req : reqs) {
             if (model.getSkillLevel(req.skill) < req.level) {
                 event.setCanceled(true);

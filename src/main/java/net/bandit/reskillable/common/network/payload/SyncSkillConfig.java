@@ -2,11 +2,14 @@ package net.bandit.reskillable.common.network.payload;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
+import net.bandit.reskillable.Configuration;
 import net.bandit.reskillable.common.commands.skills.Requirement;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.io.*;
 import java.util.Map;
@@ -75,4 +78,11 @@ public record SyncSkillConfig(Map<String, Requirement[]> skillLocks,
         return TYPE;
     }
 
+    public static void sendToClient(ServerPlayer player, boolean isFinalChunk) {
+        PacketDistributor.sendToPlayer(player, new SyncSkillConfig(Configuration.getSkillLocks(), Configuration.getCraftSkillLocks(), Configuration.getAttackSkillLocks(), isFinalChunk));
+    }
+
+    public static void sendToAllClients(boolean isFinalChunk){
+        PacketDistributor.sendToAllPlayers(new SyncSkillConfig(Configuration.getSkillLocks(), Configuration.getCraftSkillLocks(), Configuration.getAttackSkillLocks(), isFinalChunk));
+    }
 }

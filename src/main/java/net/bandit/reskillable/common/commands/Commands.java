@@ -3,6 +3,7 @@ package net.bandit.reskillable.common.commands;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.bandit.reskillable.Configuration;
+import net.bandit.reskillable.common.network.payload.SyncSkillConfig;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -26,6 +27,7 @@ public class Commands {
                                 .executes(context -> {
                                     Configuration.load();
                                     context.getSource().sendSuccess(() -> Component.literal("Skill configuration reloaded"), true);
+                                    SyncSkillConfig.sendToAllClients(false);
                                     return 1;
                                 })
                         )
