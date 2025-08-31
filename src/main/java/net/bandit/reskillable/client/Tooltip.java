@@ -1,5 +1,6 @@
 package net.bandit.reskillable.client;
 
+import com.tacz.guns.api.item.nbt.GunItemDataAccessor;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.api.spells.ISpellContainer;
 import io.redspace.ironsspellbooks.api.spells.SpellData;
@@ -40,12 +41,19 @@ public class Tooltip {
                 // TACZ:    tacz:<gun type>__<gunid>
                 // eg:      tacz:modern_kinetic_gun__bf1_tg1918
                 if (isTaczLoaded && Objects.equals(itemRegistryName.getNamespace(), "tacz")) {
-                    CompoundTag tag = (CompoundTag) stack.getTags();
-                    if (tag != null && tag.contains("GunId")) {
+                    Object tags = stack.getTags();
+                    if (tags instanceof CompoundTag tag) {
+                        if (tag.contains("GunId")) {
+                            itemRegistryName = ResourceLocation.fromNamespaceAndPath("tacz",
+                                    "%s__%s".formatted(
+                                            itemRegistryName.getPath(),
+                                            tag.getString("GunId").replaceAll(":", "_")));
+                        }
+                    } else if (stack.getItem() instanceof GunItemDataAccessor item) {
                         itemRegistryName = ResourceLocation.fromNamespaceAndPath("tacz",
                                 "%s__%s".formatted(
                                         itemRegistryName.getPath(),
-                                        tag.getString("GunId").replaceAll(":", "_")));
+                                        item.getGunId(event.getItemStack()).getPath().replaceAll(":", "_")));
                     }
                 }
 
